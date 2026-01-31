@@ -7,6 +7,7 @@ from dashboard_routes import router as dashboard_router
 from notifications_routes import router as notifications_router
 from health_routes import router as health_router
 from stage1_routes import router as stage1_router
+from stage2_routes import router as stage2_router
 
 app = FastAPI(title="Coding Ka Big Boss - Hackathon Platform")
 
@@ -27,6 +28,7 @@ app.include_router(dashboard_router)
 app.include_router(notifications_router)
 app.include_router(health_router)
 app.include_router(stage1_router)
+app.include_router(stage2_router)
 
 
 if __name__ == "__main__":

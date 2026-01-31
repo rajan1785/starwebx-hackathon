@@ -249,12 +249,12 @@
                         </div>
                         
                         <button v-if="stage2Status === 'available'" 
-                                @click="currentView = 'submission'"
+                                @click="goToSubmission"
                                 class="btn-primary w-full mt-4">
                             Start Project
                         </button>
                         <button v-if="stage2Status === 'submitted'" 
-                                @click="currentView = 'submission'"
+                                @click="goToSubmission"
                                 class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg w-full mt-4">
                             View Submission
                         </button>
@@ -309,7 +309,7 @@
                             <p class="text-sm text-gray-700"><strong>Requirements:</strong> GitHub repo, live demo (optional)</p>
                             <p class="text-sm text-gray-700"><strong>Evaluation:</strong> UI/UX, Functionality, Code Quality</p>
                         </div>
-                        <button v-if="stage2Status === 'available'" @click="currentView = 'submission'" 
+                        <button v-if="stage2Status === 'available'" @click="goToSubmission" 
                                 class="btn-primary mt-4">
                             Start Project
                         </button>
@@ -367,9 +367,48 @@
                     </div>
                 </div>
 
-                <!-- Leaderboard -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">🏆 Top Performers</h3>
+                <!-- Stage 2 Result -->
+                <div v-if="dashboard.stage2_project && dashboard.stage2_project.total_score" class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Your Round 2 Result</h3>
+                    <div class="mb-4">
+                        <p class="text-lg mb-2"><strong>Project:</strong> {{ dashboard.stage2_project.project_title }}</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600">UI/UX</p>
+                            <p class="text-2xl font-bold text-purple-600">{{ dashboard.stage2_project.ui_ux_score || 0 }}/25</p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600">Functionality</p>
+                            <p class="text-2xl font-bold text-blue-600">{{ dashboard.stage2_project.functionality_score || 0 }}/25</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600">Code Quality</p>
+                            <p class="text-2xl font-bold text-green-600">{{ dashboard.stage2_project.code_quality_score || 0 }}/25</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600">Innovation</p>
+                            <p class="text-2xl font-bold text-yellow-600">{{ dashboard.stage2_project.innovation_score || 0 }}/25</p>
+                        </div>
+                    </div>
+                    <div class="text-center mb-4">
+                        <p class="text-lg">
+                            <strong>Total Score:</strong> 
+                            <span class="text-3xl font-bold text-purple-600">{{ dashboard.stage2_project.total_score }}/100</span>
+                        </p>
+                    </div>
+                    <div v-if="dashboard.stage2_project.is_qualified" class="bg-green-50 text-green-700 p-4 rounded-lg">
+                        🎉 Congratulations! You've qualified for the Grand Finale!
+                    </div>
+                    <div v-if="dashboard.stage2_project.evaluator_comments" class="mt-4 bg-gray-50 p-4 rounded-lg">
+                        <p class="text-sm font-semibold text-gray-700 mb-2">Evaluator Comments:</p>
+                        <p class="text-sm text-gray-600">{{ dashboard.stage2_project.evaluator_comments }}</p>
+                    </div>
+                </div>
+
+                <!-- Round 1 Leaderboard -->
+                <div class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">🏆 Round 1 - Top Performers</h3>
                     <button @click="loadLeaderboard" class="mb-4 px-4 py-2 bg-purple-600 text-white rounded-lg">
                         Load Leaderboard
                     </button>
@@ -407,6 +446,53 @@
                     </div>
                     <div v-else class="text-center text-gray-500 py-8">
                         No results available yet. Complete Round 1 to see the leaderboard!
+                    </div>
+                </div>
+
+                <!-- Round 2 Leaderboard -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">🏆 Round 2 - Top Projects</h3>
+                    <button @click="loadStage2Leaderboard" class="mb-4 px-4 py-2 bg-purple-600 text-white rounded-lg">
+                        Load Round 2 Leaderboard
+                    </button>
+                    
+                    <div v-if="stage2Leaderboard.length > 0" class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">Rank</th>
+                                    <th class="px-4 py-3 text-left">Name</th>
+                                    <th class="px-4 py-3 text-left">Project</th>
+                                    <th class="px-4 py-3 text-center">UI/UX</th>
+                                    <th class="px-4 py-3 text-center">Functionality</th>
+                                    <th class="px-4 py-3 text-center">Code</th>
+                                    <th class="px-4 py-3 text-center">Innovation</th>
+                                    <th class="px-4 py-3 text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="entry in stage2Leaderboard" :key="entry.rank" 
+                                    class="border-b hover:bg-gray-50"
+                                    :class="{'bg-yellow-50': entry.rank <= 3}">
+                                    <td class="px-4 py-3">
+                                        <span v-if="entry.rank === 1">🥇</span>
+                                        <span v-else-if="entry.rank === 2">🥈</span>
+                                        <span v-else-if="entry.rank === 3">🥉</span>
+                                        <span v-else>#{{ entry.rank }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 font-medium">{{ entry.user_name }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ entry.project_title }}</td>
+                                    <td class="px-4 py-3 text-center text-sm">{{ entry.ui_ux_score }}</td>
+                                    <td class="px-4 py-3 text-center text-sm">{{ entry.functionality_score }}</td>
+                                    <td class="px-4 py-3 text-center text-sm">{{ entry.code_quality_score }}</td>
+                                    <td class="px-4 py-3 text-center text-sm">{{ entry.innovation_score }}</td>
+                                    <td class="px-4 py-3 text-center font-bold">{{ entry.total_score }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-else class="text-center text-gray-500 py-8">
+                        No Round 2 results available yet.
                     </div>
                 </div>
             </div>
