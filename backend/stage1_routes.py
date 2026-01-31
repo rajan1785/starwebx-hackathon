@@ -14,7 +14,7 @@ from schemas import (
     MCQQuestionResponse, MCQAnswerSubmit, ProgrammingProblemResponse,
     CodeSubmission, Stage1ResultResponse
 )
-from main import get_current_user, log_activity
+from auth_routes import get_current_user, log_activity
 from ai_evaluator import evaluate_code_with_ai
 
 router = APIRouter(prefix="/api/stage1", tags=["Stage 1"])

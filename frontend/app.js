@@ -199,7 +199,7 @@ const app = createApp({
         },
 
         goToExam() {
-            window.location.href = 'exam.html';
+            window.location.href = 'round1.html';
         },
 
         async loadLeaderboard() {
