@@ -13,8 +13,11 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="exam-style.css">
+
+    <!-- Toast CSS -->
+    <link rel="stylesheet" href="toast.css">
+
+    <link rel="stylesheet" href="round1.css">
 </head>
 <body class="bg-gray-50">
     <div id="app">
@@ -36,7 +39,7 @@
                             Tab Activity: <span class="font-bold" id="tabActivityCount">0</span>
                         </div>
                         <div class="timer" id="timer">
-                            Time: 01:00:00
+                            Time: 00:10:00
                         </div>
                     </div>
                 </div>
@@ -60,7 +63,7 @@
                     </div>
                     
                     <div class="bg-purple-50 border-l-4 border-purple-500 p-4">
-                        <h3 class="font-bold text-purple-900 mb-2">⏰ Total Time: <span id="totalTimeDisplay">60</span> minutes</h3>
+                        <h3 class="font-bold text-purple-900 mb-2">⏰ Total Time: <span id="totalTimeDisplay">10</span> minutes</h3>
                         <p class="text-purple-800">Timer starts when you click "Start Exam"</p>
                     </div>
                     
@@ -85,7 +88,7 @@
         </div>
 
         <!-- Exam Screen -->
-        <div id="examScreen" class="flex h-screen" style="display: none;">
+        <div id="examScreen" class="flex" style="display: none; height: calc(100vh - 67px);">
             <!-- Sidebar -->
             <div class="w-80 bg-white shadow-lg p-6 overflow-y-auto">
                 <!-- Section Tabs -->
@@ -200,9 +203,7 @@
                         <div id="monaco-editor"></div>
 
                         <div class="flex justify-between mt-4">
-                            <button id="runCodeBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                ▶ Run Code
-                            </button>
+                            <div></div>
                             <button id="submitCodeBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                                 ✓ Submit Code
                             </button>
@@ -240,6 +241,9 @@
         </div>
     </div>
 
-    <script src="exam-script.js"></script>
+    <!-- Toast JS -->
+    <script src="toast.js"></script>
+
+    <script src="round1.js"></script>
 </body>
 </html>

@@ -6,8 +6,8 @@ const state = {
     currentSection: 'mcq', // mcq, programming
     
     // Timer
-    totalTimeMinutes: 60,
-    timeRemaining: 60 * 60, // seconds
+    totalTimeMinutes: 10,
+    timeRemaining: 60 * 10, // seconds
     timerInterval: null,
     
     // MCQ
@@ -96,7 +96,7 @@ async function loadMCQQuestions() {
         renderCurrentMCQ();
     } catch (error) {
         console.error('Failed to load MCQ questions:', error);
-        alert('Failed to load questions. Please refresh the page.');
+        showToast('Failed to load MCQ questions. Please refresh the page.', '#EF4444');
     }
 }
 
@@ -108,7 +108,7 @@ async function loadProgrammingProblems() {
         renderCurrentProblem();
     } catch (error) {
         console.error('Failed to load programming problems:', error);
-        alert('Failed to load programming problems. Please refresh the page.');
+        showToast('Failed to load programming problems. Please refresh the page.', '#EF4444');
     }
 }
 
@@ -130,7 +130,7 @@ async function submitCode() {
     const code = state.monacoEditor.getValue();
     
     if (!code.trim()) {
-        alert('Please write some code before submitting.');
+        showToast('Please write some code before submitting.', '#EF4444');
         return;
     }
     
@@ -152,11 +152,11 @@ async function submitCode() {
         
         renderCodeResult();
         renderProgrammingNavigation();
-        alert(`Code submitted! Score: ${state.codeResult.score}/10`);
+        showToast(`Code submitted! Score: ${state.codeResult.score}/10`, '#4BB543');
         
     } catch (error) {
         console.error('Failed to submit code:', error);
-        alert('Failed to submit code. Please try again.');
+        showToast('Failed to submit code. Please try again.', '#EF4444');
     } finally {
         document.getElementById('submitCodeBtn').disabled = false;
         document.getElementById('submitCodeBtn').textContent = 'Submit Code';
@@ -187,11 +187,13 @@ async function trackTabSwitch() {
     }
 }
 
+function confirmSubmitExam() {
+    showModal('Are you sure you want to submit the exam? You will not be able to make any changes after submission.', async () => {
+        await submitExam();
+    });
+}
+
 async function submitExam() {
-    if (!confirm('Are you sure you want to submit the exam? You cannot make changes after submission.')) {
-        return;
-    }
-    
     try {
         await axios.post(`${API_BASE_URL}/stage1/complete`);
         
@@ -213,7 +215,7 @@ async function submitExam() {
         
     } catch (error) {
         console.error('Failed to submit exam:', error);
-        alert('Failed to submit exam. Please try again.');
+        showToast('Failed to submit exam. Please try again.', '#EF4444');
     }
 }
 
@@ -233,7 +235,7 @@ function startTimer() {
         if (state.timeRemaining <= 0) {
             state.timeRemaining = 0;
             clearInterval(state.timerInterval);
-            alert('Time is up! Exam will be auto-submitted.');
+            showToast('Time is up! Exam will be auto-submitted.', '#EF4444');
             submitExam();
         }
     }, 1000);
@@ -423,6 +425,9 @@ async function startExam() {
         }
         
         state.isFullscreen = true;
+
+        // Record start time
+        await axios.post(`${API_BASE_URL}/stage1/start`);
         
         // Load questions
         await loadMCQQuestions();
@@ -437,7 +442,7 @@ async function startExam() {
         
     } catch (error) {
         console.error('Failed to start exam:', error);
-        alert('Failed to start exam. Please try again.');
+        showToast('Failed to start exam. Please try again.', '#EF4444');
     }
 }
 
@@ -459,11 +464,10 @@ async function saveAndNextMCQ() {
         state.currentMCQIndex++;
         renderCurrentMCQ();
         renderMCQNavigation();
+    } else {
+        // Move to programming section
+        showSection('programming');
     }
-}
-
-function runCode() {
-    alert('Code preview - AI evaluation happens on submit');
 }
 
 function returnToDashboard() {
@@ -491,8 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('programmingTab').addEventListener('click', () => showSection('programming'));
     document.getElementById('previousMCQBtn').addEventListener('click', previousMCQ);
     document.getElementById('nextMCQBtn').addEventListener('click', saveAndNextMCQ);
-    document.getElementById('submitExamBtn').addEventListener('click', submitExam);
-    document.getElementById('runCodeBtn').addEventListener('click', runCode);
+    document.getElementById('submitExamBtn').addEventListener('click', confirmSubmitExam);
     document.getElementById('submitCodeBtn').addEventListener('click', submitCode);
     document.getElementById('returnToDashboardBtn').addEventListener('click', returnToDashboard);
     

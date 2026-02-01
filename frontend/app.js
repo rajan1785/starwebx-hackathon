@@ -18,7 +18,7 @@ const app = createApp({
             token: null,
             currentView: 'dashboard',
             dashboard: {
-                stage1_status: 'not_started',
+                stage1_status: 'live',
                 stage1_result: null,
                 stage2_status: 'locked',
                 stage2_project: null
@@ -27,6 +27,7 @@ const app = createApp({
             notificationCount: 0,
             showNotifications: false,
             leaderboard: [],
+            stage2Leaderboard: [],
             profileForm: {
                 phone: '',
                 college_name: '',
@@ -39,7 +40,7 @@ const app = createApp({
     },
     computed: {
         stage1Status() {
-            return this.dashboard.stage1_status || 'not_started';
+            return this.dashboard.stage1_status || 'ended';
         },
         stage2Status() {
             return this.dashboard.stage2_status || 'locked';
@@ -74,10 +75,10 @@ const app = createApp({
                 await this.loadDashboard();
                 
                 // Show success message
-                this.showMessage('Login successful!', 'success');
+                showToast('Login successful!', '#4BB543');
             } catch (error) {
                 console.error('Authentication failed:', error);
-                this.showMessage('Authentication failed. Please try again.', 'error');
+                showToast('Authentication failed. Please try again.', '#EF4444');
             }
         },
 
@@ -136,15 +137,33 @@ const app = createApp({
         },
 
         async updateProfile() {
+            // Validation
+            if (this.profileForm.phone && (this.profileForm.phone.length !== 10 || !/^\d+$/.test(this.profileForm.phone))) {
+                showToast('Please enter a valid 10-digit phone number.', '#EF4444');
+                return;
+            }
+            if (this.profileForm.year_of_study && (this.profileForm.year_of_study < 1 || this.profileForm.year_of_study > 4)) {
+                showToast('Please enter a valid year of study (1-4).', '#EF4444');
+                return;
+            }
+            if (this.profileForm.github_url && !/^https?:\/\/github\.com\/[\w-]+/.test(this.profileForm.github_url)) {
+                showToast('Please enter a valid GitHub URL.', '#EF4444');
+                return;
+            }
+            if (this.profileForm.linkedin_url && !/^https?:\/\/(www\.)?linkedin\.com\/in\/[\w-]+/.test(this.profileForm.linkedin_url)) {
+                showToast('Please enter a valid LinkedIn URL.', '#EF4444');
+                return;
+            }
+
             try {
                 const response = await axios.put(`${API_BASE_URL}/auth/profile`, this.profileForm);
                 this.user = response.data;
                 localStorage.setItem('user', JSON.stringify(this.user));
                 
-                this.showMessage('Profile updated successfully!', 'success');
+                showToast('Profile updated successfully!', '#4BB543');
             } catch (error) {
                 console.error('Failed to update profile:', error);
-                this.showMessage('Failed to update profile. Please try again.', 'error');
+                showToast('Failed to update profile. Please try again.', '#EF4444');
             }
         },
 
@@ -155,7 +174,8 @@ const app = createApp({
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             delete axios.defaults.headers.common['Authorization'];
-            this.currentView = 'dashboard';
+            // reload the page
+            window.location.reload();
         },
 
         checkAuth() {
@@ -189,15 +209,6 @@ const app = createApp({
             return date.toLocaleDateString();
         },
 
-        showMessage(message, type = 'info') {
-            // Simple alert for now - can be replaced with toast notifications
-            if (type === 'error') {
-                alert('Error: ' + message);
-            } else {
-                alert(message);
-            }
-        },
-
         goToExam() {
             window.location.href = 'round1.html';
         },
@@ -208,7 +219,21 @@ const app = createApp({
                 this.leaderboard = response.data;
             } catch (error) {
                 console.error('Failed to load leaderboard:', error);
-                this.showMessage('Failed to load leaderboard.', 'error');
+                showToast('Failed to load leaderboard.', '#EF4444');
+            }
+        },
+
+        goToSubmission() {
+            window.location.href = 'round2.html';
+        },
+
+        async loadStage2Leaderboard() {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/stage2/leaderboard?limit=20`);
+                this.stage2Leaderboard = response.data;
+            } catch (error) {
+                console.error('Failed to load Stage 2 leaderboard:', error);
+                showToast('Failed to load Stage 2 leaderboard.', '#EF4444');
             }
         }
     },

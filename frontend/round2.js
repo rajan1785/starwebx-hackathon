@@ -51,7 +51,7 @@ const app = createApp({
                 if (error.response && error.response.status === 403) {
                     this.isEligible = false;
                 } else {
-                    alert('Failed to load assignment. Please try again.');
+                    showToast('Failed to load assignment. Please try again.', '#EF4444');
                 }
             } finally {
                 this.loading = false;
@@ -105,13 +105,13 @@ const app = createApp({
             for (const file of files) {
                 // Validate file type
                 if (!file.type.startsWith('image/')) {
-                    alert(`${file.name} is not an image file`);
+                    showToast(`${file.name} is not an image file`, '#EF4444');
                     continue;
                 }
                 
                 // Validate file size (5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert(`${file.name} is too large. Maximum size is 5MB`);
+                    showToast(`${file.name} is too large. Maximum size is 5MB`, '#EF4444');
                     continue;
                 }
                 
@@ -134,7 +134,7 @@ const app = createApp({
                     
                 } catch (error) {
                     console.error('Failed to upload file:', error);
-                    alert(`Failed to upload ${file.name}`);
+                    showToast(`Failed to upload ${file.name}`, '#EF4444');
                 }
             }
         },
@@ -162,7 +162,7 @@ const app = createApp({
         
         async saveProgress() {
             if (!this.projectForm.project_title.trim()) {
-                alert('Please enter a project title');
+                showToast('Please enter a project title', '#EF4444');
                 return;
             }
             
@@ -173,18 +173,18 @@ const app = createApp({
                     }
                 });
                 
-                alert('Progress saved successfully!');
+                showToast('Progress saved successfully!', '#4BB543');
                 this.submissionStatus = 'in_progress';
                 
             } catch (error) {
                 console.error('Failed to save progress:', error);
-                alert('Failed to save progress. Please try again.');
+                showToast('Failed to save progress. Please try again.', '#EF4444');
             }
         },
         
         async submitProject() {
             if (!this.canSubmit) {
-                alert('Please fill all required fields and upload at least 3 screenshots');
+                showToast('Please fill all required fields and upload at least 3 screenshots', '#EF4444');
                 return;
             }
             
@@ -209,11 +209,11 @@ const app = createApp({
                 
                 this.submissionStatus = 'submitted';
                 
-                alert('Project submitted successfully! 🎉\n\nResults will be announced soon.');
+                showToast('Project submitted successfully! 🎉\n\nResults will be announced soon.', '#4BB543');
                 
             } catch (error) {
                 console.error('Failed to submit project:', error);
-                alert('Failed to submit project. Please try again.');
+                showToast('Failed to submit project. Please try again.', '#EF4444');
             }
         },
         

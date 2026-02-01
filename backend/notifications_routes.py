@@ -5,6 +5,7 @@ from database import get_db
 from models import User, Notification
 from schemas import NotificationResponse
 from auth_routes import get_current_user
+from datetime import timedelta
 
 router = APIRouter(prefix="/api/notifications", tags=["notifications"])
 
@@ -18,6 +19,10 @@ async def get_notifications(
     notifications = db.query(Notification).filter(
         Notification.user_id == current_user.id
     ).order_by(Notification.created_at.desc()).limit(20).all()
+
+    # Add +5:30 hours to created_at for timezone adjustment
+    for notification in notifications:
+        notification.created_at = notification.created_at + timedelta(hours=5, minutes=30)
     
     return notifications
 

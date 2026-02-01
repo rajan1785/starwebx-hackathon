@@ -5,6 +5,7 @@ from database import get_db
 from models import User, Stage1Result, Stage2Project, Notification
 from schemas import DashboardResponse, UserResponse
 from auth_routes import get_current_user
+from datetime import date
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
@@ -21,12 +22,11 @@ async def get_dashboard(
         Stage1Result.user_id == current_user.id
     ).first()
     
-    stage1_status = "not_started"
-    if stage1_result:
-        if stage1_result.completed_at:
-            stage1_status = "completed"
-        else:
-            stage1_status = "in_progress"
+    stage1_status = "live"
+    if stage1_result and stage1_result.completed_at:
+        stage1_status = "completed"
+    if date.today() > date.fromisoformat('2026-02-08'):
+        stage1_status = "ended"
     
     # Get Stage 2 project
     stage2_project = db.query(Stage2Project).filter(
@@ -39,6 +39,8 @@ async def get_dashboard(
             stage2_status = "submitted"
         else:
             stage2_status = "available"
+    if date.today() > date.fromisoformat('2026-02-12'):
+        stage2_status = "ended"
     
     # Get unread notifications count
     notifications_count = db.query(Notification).filter(

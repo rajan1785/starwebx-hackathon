@@ -16,6 +16,9 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Toast CSS -->
+    <link rel="stylesheet" href="toast.css">
     
     <style>
         [v-cloak] { display: none; }
@@ -185,9 +188,9 @@
                             <h3 class="text-xl font-bold text-gray-800">Round 1: The Small Challenge</h3>
                             <span class="px-3 py-1 rounded-full text-sm font-semibold"
                                   :class="{
-                                      'bg-yellow-100 text-yellow-800': stage1Status === 'not_started',
-                                      'bg-blue-100 text-blue-800': stage1Status === 'in_progress',
-                                      'bg-green-100 text-green-800': stage1Status === 'completed'
+                                      'bg-yellow-100 text-yellow-800': stage1Status === 'live',
+                                      'bg-green-100 text-green-800': stage1Status === 'completed',
+                                      'bg-red-100 text-red-800': stage1Status === 'ended',
                                   }">
                                 {{ stage1Status.replace('_', ' ').toUpperCase() }}
                             </span>
@@ -198,13 +201,13 @@
                         <div v-if="dashboard.stage1_result">
                             <div class="mb-3">
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>MCQ Score: {{ dashboard.stage1_result.mcq_score }}/15</span>
+                                    <span>MCQ Score: {{ dashboard.stage1_result.mcq_score }}/10</span>
                                 </div>
                                 <div class="flex justify-between text-sm mb-1">
                                     <span>Programming Score: {{ dashboard.stage1_result.programming_score }}/20</span>
                                 </div>
                                 <div class="flex justify-between text-sm font-bold">
-                                    <span>Total Score: {{ dashboard.stage1_result.total_score }}/35</span>
+                                    <span>Total Score: {{ dashboard.stage1_result.total_score }}/30</span>
                                 </div>
                             </div>
                             <div v-if="dashboard.stage1_result.rank" class="text-sm text-gray-600 mb-3">
@@ -216,11 +219,14 @@
                             </div>
                         </div>
                         
-                        <button v-if="stage1Status === 'not_started'" 
+                        <button v-if="isProfileComplete && stage1Status === 'live'" 
                                 @click="goToExam"
                                 class="btn-primary w-full mt-4">
                             Start Round 1
                         </button>
+                        <div v-if="!isProfileComplete" class="text-gray-500">
+                            🔒 Complete your profile to start the exam
+                        </div>
                         <button v-if="stage1Status === 'in_progress'" 
                                 @click="goToExam"
                                 class="btn-primary w-full mt-4">
@@ -289,9 +295,9 @@
                             <p class="text-sm text-gray-700"><strong>Total Marks:</strong> 35 (10 + 20 + 5 bonus)</p>
                             <p class="text-sm text-gray-700"><strong>Duration:</strong> 60 minutes</p>
                         </div>
-                        <button v-if="stage1Status !== 'completed'" @click="goToExam" 
+                        <button v-if="isProfileComplete && stage1Status === 'live'" @click="goToExam" 
                                 class="btn-primary mt-4">
-                            {{ stage1Status === 'not_started' ? 'Start Round 1' : 'Continue Round 1' }}
+                            {{ stage1Status === 'live' ? 'Start Round 1' : 'Continue Round 1' }}
                         </button>
                     </div>
 
@@ -515,33 +521,33 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                                <input v-model="profileForm.phone" type="tel" 
+                                <input v-model="profileForm.phone" type="tel" placeholder="10-digits"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Year of Study</label>
-                                <input v-model.number="profileForm.year_of_study" type="number" 
+                                <input v-model.number="profileForm.year_of_study" type="number" placeholder="2, 3, 4"
                                        min="1" max="5"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">College Name</label>
-                                <input v-model="profileForm.college_name" type="text" 
+                                <input v-model="profileForm.college_name" type="text" placeholder="College Name"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
-                                <input v-model="profileForm.branch" type="text" 
+                                <input v-model="profileForm.branch" type="text" placeholder="Computer Science"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
-                                <input v-model="profileForm.github_url" type="url" 
+                                <input v-model="profileForm.github_url" type="url" placeholder="https://github.com/username"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
-                                <input v-model="profileForm.linkedin_url" type="url" 
+                                <input v-model="profileForm.linkedin_url" type="url" placeholder="https://www.linkedin.com/in/username"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
                             </div>
                         </div>
@@ -580,6 +586,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast JS -->
+    <script src="toast.js"></script>
 
     <script src="app.js"></script>
 </body>

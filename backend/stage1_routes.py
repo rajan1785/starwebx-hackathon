@@ -20,6 +20,20 @@ from ai_evaluator import evaluate_code_with_ai
 router = APIRouter(prefix="/api/stage1", tags=["Stage 1"])
 
 
+# ============== Start ==============
+@router.post("/start")
+async def start_stage1(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Mark the start of Stage 1 for the user"""
+    # Log activity
+    log_activity(db, current_user.id, "stage1_start", {}, request)
+    
+    return {"status": "Stage 1 started successfully"}
+
+
 # ============== MCQ ROUTES ==============
 
 @router.get("/mcq/questions", response_model=List[MCQQuestionResponse])
@@ -342,7 +356,7 @@ async def complete_stage1(
     for idx, r in enumerate(all_results, 1):
         r.rank = idx
         # Top 50% qualify for Stage 2 (adjust as needed)
-        r.is_qualified = idx <= len(all_results) // 2
+        # r.is_qualified = idx <= len(all_results) // 2
     
     db.commit()
     db.refresh(result)
