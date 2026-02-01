@@ -15,8 +15,8 @@ from auth_routes import get_current_user, log_activity
 router = APIRouter(prefix="/api/stage2", tags=["Stage 2"])
 
 # Upload directory
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+# UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 # ============== CHECK ELIGIBILITY ==============
@@ -119,45 +119,45 @@ async def get_project_assignment(
 
 # ============== FILE UPLOAD ==============
 
-@router.post("/upload-screenshot")
-async def upload_screenshot(
-    file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Upload project screenshot"""
-    # Check eligibility
-    check_stage2_eligibility(current_user.id, db)
+# @router.post("/upload-screenshot")
+# async def upload_screenshot(
+#     file: UploadFile = File(...),
+#     current_user: User = Depends(get_current_user),
+#     db: Session = Depends(get_db)
+# ):
+#     """Upload project screenshot"""
+#     # Check eligibility
+#     check_stage2_eligibility(current_user.id, db)
     
-    # Validate file type
-    allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
-    file_extension = file.filename.split('.')[-1].lower()
+#     # Validate file type
+#     allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+#     file_extension = file.filename.split('.')[-1].lower()
     
-    if file_extension not in allowed_extensions:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Allowed: {', '.join(allowed_extensions)}"
-        )
+#     if file_extension not in allowed_extensions:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail=f"Invalid file type. Allowed: {', '.join(allowed_extensions)}"
+#         )
     
-    # Generate unique filename
-    unique_filename = f"{uuid.uuid4()}_{file.filename}"
-    file_path = os.path.join(UPLOAD_DIR, unique_filename)
+#     # Generate unique filename
+#     unique_filename = f"{uuid.uuid4()}_{file.filename}"
+#     file_path = os.path.join(UPLOAD_DIR, unique_filename)
     
-    # Save file
-    try:
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}"
-        )
+#     # Save file
+#     try:
+#         with open(file_path, "wb") as buffer:
+#             shutil.copyfileobj(file.file, buffer)
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f"Failed to upload file: {str(e)}"
+#         )
     
-    return {
-        "status": "success",
-        "filename": unique_filename,
-        "url": f"/uploads/{unique_filename}"
-    }
+#     return {
+#         "status": "success",
+#         "filename": unique_filename,
+#         "url": f"/uploads/{unique_filename}"
+#     }
 
 
 # ============== PROJECT SUBMISSION ==============
@@ -285,29 +285,29 @@ async def update_project(
 
 # ============== DELETE SCREENSHOT ==============
 
-@router.delete("/screenshot/{filename}")
-async def delete_screenshot(
-    filename: str,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Delete uploaded screenshot"""
-    # Check eligibility
-    check_stage2_eligibility(current_user.id, db)
+# @router.delete("/screenshot/{filename}")
+# async def delete_screenshot(
+#     filename: str,
+#     current_user: User = Depends(get_current_user),
+#     db: Session = Depends(get_db)
+# ):
+#     """Delete uploaded screenshot"""
+#     # Check eligibility
+#     check_stage2_eligibility(current_user.id, db)
     
-    file_path = os.path.join(UPLOAD_DIR, filename)
+#     file_path = os.path.join(UPLOAD_DIR, filename)
     
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-            return {"status": "success", "message": "Screenshot deleted"}
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to delete file: {str(e)}"
-            )
-    else:
-        raise HTTPException(status_code=404, detail="File not found")
+#     if os.path.exists(file_path):
+#         try:
+#             os.remove(file_path)
+#             return {"status": "success", "message": "Screenshot deleted"}
+#         except Exception as e:
+#             raise HTTPException(
+#                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#                 detail=f"Failed to delete file: {str(e)}"
+#             )
+#     else:
+#         raise HTTPException(status_code=404, detail="File not found")
 
 
 # ============== STAGE 2 LEADERBOARD ==============
