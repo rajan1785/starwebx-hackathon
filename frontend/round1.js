@@ -90,6 +90,7 @@ function showSection(sectionName) {
 // API Functions
 async function loadMCQQuestions() {
     try {
+        document.getElementById('global-loader').style.display = 'flex';
         const response = await axios.get(`${API_BASE_URL}/stage1/mcq/questions`);
         state.mcqQuestions = response.data;
         renderMCQNavigation();
@@ -97,11 +98,14 @@ async function loadMCQQuestions() {
     } catch (error) {
         console.error('Failed to load MCQ questions:', error);
         showToast('Failed to load MCQ questions. Please refresh the page.', '#EF4444');
+    } finally {
+        document.getElementById('global-loader').style.display = 'none';
     }
 }
 
 async function loadProgrammingProblems() {
     try {
+        document.getElementById('global-loader').style.display = 'flex';
         const response = await axios.get(`${API_BASE_URL}/stage1/programming/problems`);
         state.programmingProblems = response.data;
         renderProgrammingNavigation();
@@ -109,6 +113,8 @@ async function loadProgrammingProblems() {
     } catch (error) {
         console.error('Failed to load programming problems:', error);
         showToast('Failed to load programming problems. Please refresh the page.', '#EF4444');
+    } finally {
+        document.getElementById('global-loader').style.display = 'none';
     }
 }
 
@@ -195,6 +201,7 @@ function confirmSubmitExam() {
 
 async function submitExam() {
     try {
+        document.getElementById('global-loader').style.display = 'flex';
         await axios.post(`${API_BASE_URL}/stage1/complete`);
         
         // Stop timer
@@ -216,6 +223,8 @@ async function submitExam() {
     } catch (error) {
         console.error('Failed to submit exam:', error);
         showToast('Failed to submit exam. Please try again.', '#EF4444');
+    } finally {
+        document.getElementById('global-loader').style.display = 'none';
     }
 }
 
@@ -393,6 +402,9 @@ function renderCurrentProblem() {
     } else {
         document.getElementById('problemConstraintsContainer').style.display = 'none';
     }
+
+    // Reset result container
+    document.getElementById('codeResultContainer').style.display = 'none';
 }
 
 function renderCodeResult() {
@@ -427,6 +439,7 @@ async function startExam() {
         state.isFullscreen = true;
 
         // Record start time
+        document.getElementById('global-loader').style.display = 'flex';
         await axios.post(`${API_BASE_URL}/stage1/start`);
         
         // Load questions
@@ -443,6 +456,8 @@ async function startExam() {
     } catch (error) {
         console.error('Failed to start exam:', error);
         showToast('Failed to start exam. Please try again.', '#EF4444');
+    } finally {
+        document.getElementById('global-loader').style.display = 'none';
     }
 }
 
@@ -457,7 +472,7 @@ function previousMCQ() {
 async function saveAndNextMCQ() {
     const currentMCQ = state.mcqQuestions[state.currentMCQIndex];
     if (currentMCQ && state.mcqAnswers[currentMCQ.id]) {
-        await submitMCQAnswer(currentMCQ.id, state.mcqAnswers[currentMCQ.id]);
+        submitMCQAnswer(currentMCQ.id, state.mcqAnswers[currentMCQ.id]);
     }
     
     if (state.currentMCQIndex < state.mcqQuestions.length - 1) {

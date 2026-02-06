@@ -39,6 +39,8 @@ async def get_dashboard(
             stage2_status = "submitted"
         else:
             stage2_status = "available"
+    if date.today() < date.fromisoformat('2026-02-08'):
+        stage2_status = "coming-soon"
     if date.today() > date.fromisoformat('2026-02-12'):
         stage2_status = "ended"
     

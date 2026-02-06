@@ -13,6 +13,7 @@ window.handleGoogleLogin = async function(response) {
 const app = createApp({
     data() {
         return {
+            loading: false,
             isAuthenticated: false,
             user: null,
             token: null,
@@ -56,9 +57,11 @@ const app = createApp({
     methods: {
         async handleGoogleAuth(credential) {
             try {
+                this.loading = true;
                 const response = await axios.post(`${API_BASE_URL}/auth/google`, {
                     token: credential
                 });
+                this.loading = false;
 
                 this.token = response.data.access_token;
                 this.user = response.data.user;
@@ -84,6 +87,7 @@ const app = createApp({
 
         async loadDashboard() {
             try {
+                this.loading = true;
                 const response = await axios.get(`${API_BASE_URL}/dashboard`);
                 this.dashboard = response.data;
                 this.notificationCount = response.data.notifications_count || 0;
@@ -101,11 +105,14 @@ const app = createApp({
                 if (error.response && error.response.status === 401) {
                     this.logout();
                 }
+            } finally {
+                this.loading = false;
             }
         },
 
         async loadNotifications() {
             try {
+                this.loading = true;
                 const response = await axios.get(`${API_BASE_URL}/notifications`);
                 this.notifications = response.data;
                 this.showNotifications = true;
@@ -120,6 +127,8 @@ const app = createApp({
                 this.notificationCount = 0;
             } catch (error) {
                 console.error('Failed to load notifications:', error);
+            } finally {
+                this.loading = false;
             }
         },
 
@@ -156,6 +165,7 @@ const app = createApp({
             }
 
             try {
+                this.loading = true;
                 const response = await axios.put(`${API_BASE_URL}/auth/profile`, this.profileForm);
                 this.user = response.data;
                 localStorage.setItem('user', JSON.stringify(this.user));
@@ -164,6 +174,8 @@ const app = createApp({
             } catch (error) {
                 console.error('Failed to update profile:', error);
                 showToast('Failed to update profile. Please try again.', '#EF4444');
+            } finally {
+                this.loading = false;
             }
         },
 
@@ -215,11 +227,14 @@ const app = createApp({
 
         async loadLeaderboard() {
             try {
+                this.loading = true;
                 const response = await axios.get(`${API_BASE_URL}/stage1/leaderboard?limit=20`);
                 this.leaderboard = response.data;
             } catch (error) {
                 console.error('Failed to load leaderboard:', error);
                 showToast('Failed to load leaderboard.', '#EF4444');
+            } finally {
+                this.loading = false;
             }
         },
 
@@ -229,11 +244,14 @@ const app = createApp({
 
         async loadStage2Leaderboard() {
             try {
+                this.loading = true;
                 const response = await axios.get(`${API_BASE_URL}/stage2/leaderboard?limit=20`);
                 this.stage2Leaderboard = response.data;
             } catch (error) {
                 console.error('Failed to load Stage 2 leaderboard:', error);
                 showToast('Failed to load Stage 2 leaderboard.', '#EF4444');
+            } finally {
+                this.loading = false;
             }
         }
     },

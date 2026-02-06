@@ -121,7 +121,7 @@
             <div class="card p-8 text-center">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Round 2 Locked 🔒</h2>
                 <p class="text-gray-600 mb-6">You need to qualify Round 1 to access Round 2.</p>
-                <button @click="returnToDashboard" class="px-6 py-3 bg-purple-600 text-white rounded-lg">
+                <button @click="returnToDashboard" class="px-6 py-3 bg-blue-600 text-white rounded-lg">
                     Return to Dashboard
                 </button>
             </div>
@@ -176,7 +176,7 @@
                                        type="text" 
                                        required
                                        :disabled="isSubmitted"
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="My Awesome Project">
                             </div>
 
@@ -189,7 +189,7 @@
                                           rows="5" 
                                           required
                                           :disabled="isSubmitted"
-                                          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                           placeholder="Describe your project, its features, and what problem it solves..."></textarea>
                             </div>
 
@@ -202,7 +202,7 @@
                                        type="url" 
                                        required
                                        :disabled="isSubmitted"
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="https://github.com/username/repo">
                             </div>
 
@@ -214,7 +214,7 @@
                                 <input v-model="projectForm.live_demo_url" 
                                        type="url"
                                        :disabled="isSubmitted"
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="https://your-project.vercel.app">
                             </div>
 
@@ -228,12 +228,12 @@
                                            type="text"
                                            :disabled="isSubmitted"
                                            @keyup.enter="addTech"
-                                           class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                           class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                            placeholder="e.g., Vue.js, FastAPI, MySQL">
                                     <button type="button" 
                                             @click="addTech"
                                             :disabled="isSubmitted"
-                                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50">
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                                         Add
                                     </button>
                                 </div>
@@ -334,7 +334,7 @@
                                     <span class="font-bold">25 pts</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-purple-600 h-2 rounded-full" style="width: 25%"></div>
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 25%"></div>
                                 </div>
                             </div>
                             <div>
