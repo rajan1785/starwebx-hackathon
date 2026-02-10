@@ -16,7 +16,6 @@ const app = createApp({
                 live_demo_url: '',
                 tech_stack: []
             },
-            screenshots: [], // Array of uploaded filenames
             newTech: '',
             isDragging: false,
             token: null
@@ -31,8 +30,7 @@ const app = createApp({
                 this.projectForm.project_title.trim() !== '' &&
                 this.projectForm.project_description.trim() !== '' &&
                 this.projectForm.github_repo_url.trim() !== '' &&
-                this.projectForm.tech_stack.length > 0 &&
-                this.screenshots.length >= 3
+                this.projectForm.tech_stack.length > 0
             );
         }
     },
@@ -69,7 +67,6 @@ const app = createApp({
                     this.projectForm.github_repo_url = project.github_repo_url || '';
                     this.projectForm.live_demo_url = project.live_demo_url || '';
                     this.projectForm.tech_stack = project.tech_stack || [];
-                    this.screenshots = project.screenshots || [];
                     this.submissionStatus = project.submission_status;
                 }
             } catch (error) {
@@ -90,76 +87,6 @@ const app = createApp({
             this.projectForm.tech_stack.splice(index, 1);
         },
         
-        async handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            await this.uploadFiles(files);
-        },
-        
-        async handleDrop(event) {
-            this.isDragging = false;
-            const files = Array.from(event.dataTransfer.files);
-            await this.uploadFiles(files);
-        },
-        
-        async uploadFiles(files) {
-            for (const file of files) {
-                // Validate file type
-                if (!file.type.startsWith('image/')) {
-                    showToast(`${file.name} is not an image file`, '#EF4444');
-                    continue;
-                }
-                
-                // Validate file size (5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast(`${file.name} is too large. Maximum size is 5MB`, '#EF4444');
-                    continue;
-                }
-                
-                // Upload file
-                try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    
-                    const response = await axios.post(
-                        `${API_BASE_URL}/stage2/upload-screenshot`,
-                        formData,
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data'
-                            }
-                        }
-                    );
-                    
-                    this.screenshots.push(response.data.filename);
-                    
-                } catch (error) {
-                    console.error('Failed to upload file:', error);
-                    showToast(`Failed to upload ${file.name}`, '#EF4444');
-                }
-            }
-        },
-        
-        async removeScreenshot(index) {
-            if (!confirm('Are you sure you want to remove this screenshot?')) {
-                return;
-            }
-            
-            const filename = this.screenshots[index];
-            
-            try {
-                await axios.delete(`${API_BASE_URL}/stage2/screenshot/${filename}`);
-                this.screenshots.splice(index, 1);
-            } catch (error) {
-                console.error('Failed to delete screenshot:', error);
-                // Remove from UI anyway
-                this.screenshots.splice(index, 1);
-            }
-        },
-        
-        getScreenshotUrl(filename) {
-            return `${API_BASE_URL.replace('/api', '')}/uploads/${filename}`;
-        },
-        
         async saveProgress() {
             if (!this.projectForm.project_title.trim()) {
                 showToast('Please enter a project title', '#EF4444');
@@ -167,11 +94,7 @@ const app = createApp({
             }
             
             try {
-                await axios.put(`${API_BASE_URL}/stage2/update`, this.projectForm, {
-                    params: {
-                        screenshots: this.screenshots
-                    }
-                });
+await axios.put(`${API_BASE_URL}/stage2/update`, this.projectForm);
                 
                 showToast('Progress saved successfully!', '#4BB543');
                 this.submissionStatus = 'in_progress';
@@ -199,12 +122,7 @@ const app = createApp({
                 
                 const response = await axios.post(
                     `${API_BASE_URL}/stage2/submit`,
-                    submitData,
-                    {
-                        params: {
-                            screenshots: this.screenshots
-                        }
-                    }
+                    submitData
                 );
                 
                 this.submissionStatus = 'submitted';

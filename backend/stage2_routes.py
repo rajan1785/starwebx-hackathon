@@ -116,56 +116,11 @@ async def get_project_assignment(
     
     return assignment
 
-
-# ============== FILE UPLOAD ==============
-
-# @router.post("/upload-screenshot")
-# async def upload_screenshot(
-#     file: UploadFile = File(...),
-#     current_user: User = Depends(get_current_user),
-#     db: Session = Depends(get_db)
-# ):
-#     """Upload project screenshot"""
-#     # Check eligibility
-#     check_stage2_eligibility(current_user.id, db)
-    
-#     # Validate file type
-#     allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
-#     file_extension = file.filename.split('.')[-1].lower()
-    
-#     if file_extension not in allowed_extensions:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=f"Invalid file type. Allowed: {', '.join(allowed_extensions)}"
-#         )
-    
-#     # Generate unique filename
-#     unique_filename = f"{uuid.uuid4()}_{file.filename}"
-#     file_path = os.path.join(UPLOAD_DIR, unique_filename)
-    
-#     # Save file
-#     try:
-#         with open(file_path, "wb") as buffer:
-#             shutil.copyfileobj(file.file, buffer)
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail=f"Failed to upload file: {str(e)}"
-#         )
-    
-#     return {
-#         "status": "success",
-#         "filename": unique_filename,
-#         "url": f"/uploads/{unique_filename}"
-#     }
-
-
 # ============== PROJECT SUBMISSION ==============
 
 @router.post("/submit", response_model=Stage2ProjectResponse)
 async def submit_project(
     submission: Stage2ProjectSubmit,
-    screenshots: List[str],  # List of uploaded filenames
     request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -189,7 +144,6 @@ async def submit_project(
     project.github_repo_url = submission.github_repo_url
     project.live_demo_url = submission.live_demo_url
     project.tech_stack = submission.tech_stack
-    project.screenshots = screenshots
     project.submission_status = 'submitted'
     project.submitted_at = datetime.utcnow()
     
@@ -242,7 +196,6 @@ async def get_project_submission(
 @router.put("/update", response_model=Stage2ProjectResponse)
 async def update_project(
     submission: Stage2ProjectSubmit,
-    screenshots: Optional[List[str]] = None,
     request: Request = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -271,44 +224,12 @@ async def update_project(
     project.github_repo_url = submission.github_repo_url
     project.live_demo_url = submission.live_demo_url
     project.tech_stack = submission.tech_stack
-    
-    if screenshots:
-        project.screenshots = screenshots
-    
     project.submission_status = 'in_progress'
     
     db.commit()
     db.refresh(project)
     
     return Stage2ProjectResponse.from_orm(project)
-
-
-# ============== DELETE SCREENSHOT ==============
-
-# @router.delete("/screenshot/{filename}")
-# async def delete_screenshot(
-#     filename: str,
-#     current_user: User = Depends(get_current_user),
-#     db: Session = Depends(get_db)
-# ):
-#     """Delete uploaded screenshot"""
-#     # Check eligibility
-#     check_stage2_eligibility(current_user.id, db)
-    
-#     file_path = os.path.join(UPLOAD_DIR, filename)
-    
-#     if os.path.exists(file_path):
-#         try:
-#             os.remove(file_path)
-#             return {"status": "success", "message": "Screenshot deleted"}
-#         except Exception as e:
-#             raise HTTPException(
-#                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#                 detail=f"Failed to delete file: {str(e)}"
-#             )
-#     else:
-#         raise HTTPException(status_code=404, detail="File not found")
-
 
 # ============== STAGE 2 LEADERBOARD ==============
 

@@ -92,7 +92,9 @@
                     <div class="flex items-center">
                         <h1 class="text-white text-2xl font-bold">Coding Ka BIG BOSS</h1>
                     </div>
-                    <div class="flex items-center space-x-6">
+                    
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:flex items-center space-x-6">
                         <a href="#" @click.prevent="currentView = 'dashboard'" 
                            class="text-white hover:text-gray-200 font-medium"
                            :class="{'border-b-2 border-white': currentView === 'dashboard'}">
@@ -124,6 +126,50 @@
                             Logout
                         </button>
                     </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-white">
+                        <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div v-if="mobileMenuOpen" class="md:hidden pb-4 space-y-2">
+                    <a href="#" @click.prevent="currentView = 'dashboard'; mobileMenuOpen = false" 
+                       class="block text-white hover:text-gray-200 font-medium py-2"
+                       :class="{'border-l-4 border-white': currentView === 'dashboard'}">
+                        Dashboard
+                    </a>
+                    <a href="#" @click.prevent="currentView = 'rounds'; mobileMenuOpen = false" 
+                       class="block text-white hover:text-gray-200 font-medium py-2"
+                       :class="{'border-l-4 border-white': currentView === 'rounds'}">
+                        Rounds
+                    </a>
+                    <a href="#" @click.prevent="currentView = 'results'; mobileMenuOpen = false" 
+                       class="block text-white hover:text-gray-200 font-medium py-2"
+                       :class="{'border-l-4 border-white': currentView === 'results'}">
+                        Results
+                    </a>
+                    <a href="#" @click.prevent="loadNotifications; mobileMenuOpen = false" 
+                       class="block text-white hover:text-gray-200 font-medium py-2 relative">
+                        Notification
+                        <span v-if="notificationCount > 0" class="notification-badge">
+                            {{ notificationCount }}
+                        </span>
+                    </a>
+                    <a href="#" @click.prevent="currentView = 'profile'; mobileMenuOpen = false" 
+                       class="block text-white hover:text-gray-200 font-medium py-2">
+                        Profile
+                    </a>
+                    <button @click="logout; mobileMenuOpen = false" 
+                            class="block text-white hover:text-gray-200 font-medium py-2 w-full text-left">
+                        Logout
+                    </button>
                 </div>
             </div>
         </nav>

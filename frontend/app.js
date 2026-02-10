@@ -18,6 +18,7 @@ const app = createApp({
             user: null,
             token: null,
             currentView: 'dashboard',
+            mobileMenuOpen: false,
             dashboard: {
                 stage1_status: 'live',
                 stage1_result: null,
